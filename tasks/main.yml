@@ -1,0 +1,32 @@
+---
+- name: Install with os repository
+  when: hashicorp_install_type == "repository"
+  include: "{{ item }}"
+  with_first_found:
+    - "{{ ansible_distribution | lower }}.yml"
+    - "{{ ansible_os_family | lower }}.yml"
+
+- name: Install with archive
+  when: hashicorp_install_type == "archive"
+  include: "archive.yml"
+
+- name: Install terraform-docs
+  when: terraform_docs_version is defined
+  get_url:
+    url: https://github.com/segmentio/terraform-docs/releases/download/v{{ terraform_docs_version }}/terraform-docs-v{{ terraform_docs_version }}-{{ ansible_system | lower }}-amd64
+    dest: /usr/bin
+    mode: 0777
+
+- name: Install terraform-docs (move binary)
+  when: terraform_docs_version is defined
+  file:
+    src: /usr/bin/terraform-docs-v{{ terraform_docs_version }}-{{ ansible_system | lower }}-amd64
+    path: /usr/bin/terraform-docs
+    state: hard
+    force: true
+
+- name: Uninstall terraform-docs
+  when: terraform_docs_version is undefined
+  file:
+    path: /usr/bin/terraform-docs
+    state: absent

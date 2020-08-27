@@ -1,0 +1,53 @@
+---
+- name: "Uninstall hashicorp products"
+  when: hashicorp_product.version == ''
+  apt:
+    name: "{{ hashicorp_product.name }}"
+    state: absent
+    update_cache: true
+    force: true
+  loop_control:
+    loop_var: hashicorp_product
+  loop:
+    - name: consul
+      version: "{{ consul_version | default('') }}"
+    - name: nomad
+      version: "{{ nomad_version | default('') }}"
+    - name: terraform
+      version: "{{ terraform_version | default('') }}"
+    - name: vagrant
+      version: "{{ vagrant_version | default('') }}"
+    - name: vault
+      version: "{{ vault_version | default('') }}"
+
+- name: Add gpg key
+  apt_key:
+    url: https://apt.releases.hashicorp.com/gpg
+    state: present
+
+- name: "Add apt repositories"
+  apt_repository:
+    state: present
+    update_cache: true
+    repo: "deb [arch=amd64] https://apt.releases.hashicorp.com {{ ansible_distribution_release|lower }} main"
+
+- name: "Install hashicorp products"
+  when: hashicorp_product.version != ""
+  apt:
+    name: "{{ hashicorp_product.name }}={{ hashicorp_product.version }}*"
+    state: present
+    update_cache: true
+    force: true
+  loop_control:
+    loop_var: hashicorp_product
+  loop:
+    - name: consul
+      version: "{{ consul_version | default('') }}"
+    - name: nomad
+      version: "{{ nomad_version | default('') }}"
+    - name: terraform
+      version: "{{ terraform_version | default('') }}"
+    - name: vagrant
+      version: "{{ vagrant_version | default('') }}"
+    - name: vault
+      version: "{{ vault_version | default('') }}"

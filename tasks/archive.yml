@@ -1,0 +1,51 @@
+---
+# - name: Include ansible_distribution and ansible_os_family tasks
+#   include: "{{ item }}"
+#   with_first_found:
+#     - "{{ ansible_distribution | lower }}.yml"
+#     - "{{ ansible_os_family | lower }}.yml"
+
+- name: Install required packages
+  package:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - unzip
+
+- name: Uninstall file
+  when: hashicorp_product.version == ""
+  file:
+    path: "/usr/local/bin/{{ hashicorp_product.name }}"
+    state: absent
+  loop_control:
+    loop_var: hashicorp_product
+  loop:
+    - name: consul
+      version: "{{ consul_version | default('') }}"
+    - name: nomad
+      version: "{{ nomad_version | default('') }}"
+    - name: terraform
+      version: "{{ terraform_version | default('') }}"
+    - name: vagrant
+      version: "{{ vagrant_version | default('') }}"
+    - name: vault
+      version: "{{ vault_version | default('') }}"
+
+- name: Install hashicorp products
+  when: item.version != ''
+  unarchive:
+    src: https://releases.hashicorp.com/{{ item.name }}/{{ item.version }}/{{ item.name }}_{{ item.version }}_{{ ansible_system | lower }}_amd64.zip
+    dest: /usr/local/bin
+    mode: 0777
+    remote_src: true
+  loop:
+    - name: consul
+      version: "{{ consul_version | default('') }}"
+    - name: nomad
+      version: "{{ nomad_version | default('') }}"
+    - name: terraform
+      version: "{{ terraform_version | default('') }}"
+    - name: vagrant
+      version: "{{ vagrant_version | default('') }}"
+    - name: vault
+      version: "{{ vault_version | default('') }}"
