@@ -24,6 +24,8 @@
       version: "{{ consul_version | default('') }}"
     - name: nomad
       version: "{{ nomad_version | default('') }}"
+    - name: packer
+      version: "{{ packer_version | default('') }}"
     - name: terraform
       version: "{{ terraform_version | default('') }}"
     - name: vagrant
@@ -43,6 +45,8 @@
       version: "{{ consul_version | default('') }}"
     - name: nomad
       version: "{{ nomad_version | default('') }}"
+    - name: packer
+      version: "{{ packer_version | default('') }}"
     - name: terraform
       version: "{{ terraform_version | default('') }}"
     - name: vagrant
